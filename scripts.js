@@ -21,10 +21,43 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
                     feed.appendChild(postElement);
+
+                    // Add event listeners for reaction buttons
+                    postElement.querySelector('.like').addEventListener('click', () => {
+                        showParticles(postElement, 'like');
+                    });
+                    postElement.querySelector('.dislike').addEventListener('click', () => {
+                        showParticles(postElement, 'dislike');
+                    });
+                    postElement.querySelector('.love').addEventListener('click', () => {
+                        showParticles(postElement, 'love');
+                    });
                 });
                 content.innerHTML = '';
                 content.appendChild(feed);
             });
+    }
+
+    const showParticles = (element, reaction) => {
+        const colors = {
+            like: 'blue',
+            dislike: 'red',
+            love: 'pink'
+        };
+        const particleContainer = document.createElement('div');
+        particleContainer.className = 'particle-container';
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.backgroundColor = colors[reaction];
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            particleContainer.appendChild(particle);
+        }
+        element.appendChild(particleContainer);
+        setTimeout(() => {
+            particleContainer.remove();
+        }, 1000);
     }
 
     const loadMessaging = () => {
