@@ -19,6 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button class="dislike">Dislike</button>
                             <button class="love">Love</button>
                         </div>
+                        <div class="comments">
+                            <h4>Comments</h4>
+                            <div class="comments-list"></div>
+                            <textarea class="comment-input" placeholder="Add a comment..."></textarea>
+                            <button class="comment-submit">Submit</button>
+                        </div>
                     `;
                     feed.appendChild(postElement);
 
@@ -31,6 +37,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     postElement.querySelector('.love').addEventListener('click', () => {
                         showParticles(postElement, 'love');
+                    });
+
+                    // Add event listener for comment submission
+                    postElement.querySelector('.comment-submit').addEventListener('click', () => {
+                        const commentInput = postElement.querySelector('.comment-input');
+                        const commentText = commentInput.value.trim();
+                        if (commentText) {
+                            const commentElement = document.createElement('div');
+                            commentElement.className = 'comment';
+                            commentElement.innerText = commentText;
+                            postElement.querySelector('.comments-list').appendChild(commentElement);
+                            commentInput.value = '';
+                        }
                     });
                 });
                 content.innerHTML = '';
@@ -97,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 content.innerHTML = '';
                 content.appendChild(friendsList);
-    
+
                 const searchInput = document.createElement('input');
                 searchInput.type = 'text';
                 searchInput.id = 'search';
