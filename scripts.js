@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const content = document.getElementById('content');
 
     const loadFeed = () => {
-        fetch('posts.json')
+        fetch('./mocks/posts.json')
             .then(response => response.json())
             .then(posts => {
                 const feed = document.createElement('div');
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const loadMessaging = () => {
-        fetch('conversations.json')
+        fetch('./mocks/conversations.json')
             .then(response => response.json())
             .then(conversations => {
                 const conversationsDiv = document.createElement('div');
@@ -48,45 +48,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const loadFriends = () => {
-        const friends = [
-            { name: 'John Doe' },
-            { name: 'Jane Smith' },
-            { name: 'Alice Johnson' },
-        ];
-
-        const friendsList = document.createElement('ul');
-        friendsList.id = 'friends-list';
-        friends.forEach(friend => {
-            const friendElement = document.createElement('li');
-            friendElement.className = 'friend';
-            friendElement.innerHTML = `
-                <span>${friend.name}</span>
-                <button class="message">Message</button>
-            `;
-            friendsList.appendChild(friendElement);
-        });
-        content.innerHTML = '';
-        content.appendChild(friendsList);
-
-        const searchInput = document.createElement('input');
-        searchInput.type = 'text';
-        searchInput.id = 'search';
-        searchInput.placeholder = 'Search friends...';
-        searchInput.addEventListener('input', () => {
-            const searchTerm = searchInput.value.toLowerCase();
-            const filteredFriends = friends.filter(friend => friend.name.toLowerCase().includes(searchTerm));
-            friendsList.innerHTML = '';
-            filteredFriends.forEach(friend => {
-                const friendElement = document.createElement('li');
-                friendElement.className = 'friend';
-                friendElement.innerHTML = `
-                    <span>${friend.name}</span>
-                    <button class="message">Message</button>
-                `;
-                friendsList.appendChild(friendElement);
-            });
-        });
-        content.prepend(searchInput);
+        fetch('./mocks/friends.json')
+            .then(response => response.json())
+            .then(friends => {
+                const friendsList = document.createElement('ul');
+                friendsList.id = 'friends-list';
+                friends.forEach(friend => {
+                    const friendElement = document.createElement('li');
+                    friendElement.className = 'friend';
+                    friendElement.innerHTML = `
+                        <span>${friend.name}</span>
+                        <button class="message">Message</button>
+                    `;
+                    friendsList.appendChild(friendElement);
+                });
+                content.innerHTML = '';
+                content.appendChild(friendsList);
+    
+                const searchInput = document.createElement('input');
+                searchInput.type = 'text';
+                searchInput.id = 'search';
+                searchInput.placeholder = 'Search friends...';
+                searchInput.addEventListener('input', () => {
+                    const searchTerm = searchInput.value.toLowerCase();
+                    const filteredFriends = friends.filter(friend => friend.name.toLowerCase().includes(searchTerm));
+                    friendsList.innerHTML = '';
+                    filteredFriends.forEach(friend => {
+                        const friendElement = document.createElement('li');
+                        friendElement.className = 'friend';
+                        friendElement.innerHTML = `
+                            <span>${friend.name}</span>
+                            <button class="message">Message</button>
+                        `;
+                        friendsList.appendChild(friendElement);
+                    });
+                });
+                content.prepend(searchInput);
+            })
+            .catch(error => console.error('Error fetching friends:', error));
     }
 
     const loadPage = (page) => {
