@@ -73,3 +73,63 @@ input[type="text"] {
         opacity: 0;
     }
 }
+
+.full-screen-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.full-screen-image {
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.post {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff;
+}
+
+.post-image {
+    width: 300px; /* Set the desired width */
+    height: auto; /* Maintain aspect ratio */
+    margin-bottom: 10px; /* Space between image and content */
+}
+
+.reactions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px; /* Space between reactions and comments */
+}
+
+.reactions button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px #bebebe, -2px -2px 5px #ffffff;
+}
+
+.comments {
+    margin-top: 10px;
+}
+
+.comment {
+    margin-top: 5px;
+    padding: 5px;
+    background: #e0e0e0;
+    border-radius: 5px;
+}

@@ -11,9 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     const postElement = document.createElement('div');
                     postElement.className = 'post';
                     postElement.innerHTML = `
-                        <h3>${post.title}</h3>
-                        <p>${post.content}</p>
-                        ${post.image ? `<img src="${post.image}" alt="${post.title}">` : ''}
+                        ${post.image ? `<img src="${post.image}" alt="${post.title}" class="post-image">` : ''}
+                        <div class="post-content">
+                            <h3>${post.title}</h3>
+                            <p>${post.content}</p>
+                        </div>
                         <div class="reactions">
                             <button class="like">Like</button>
                             <button class="dislike">Dislike</button>
@@ -51,6 +53,24 @@ document.addEventListener('DOMContentLoaded', () => {
                             commentInput.value = '';
                         }
                     });
+
+                    // Add event listener for image click to display in full screen
+                    const postImage = postElement.querySelector('.post-image');
+                    if (postImage) {
+                        postImage.addEventListener('click', () => {
+                            const fullScreenOverlay = document.createElement('div');
+                            fullScreenOverlay.className = 'full-screen-overlay';
+                            fullScreenOverlay.innerHTML = `
+                                <img src="${post.image}" alt="${post.title}" class="full-screen-image">
+                            `;
+                            document.body.appendChild(fullScreenOverlay);
+
+                            // Add event listener to remove full screen overlay on click
+                            fullScreenOverlay.addEventListener('click', () => {
+                                fullScreenOverlay.remove();
+                            });
+                        });
+                    }
                 });
                 content.innerHTML = '';
                 content.appendChild(feed);
