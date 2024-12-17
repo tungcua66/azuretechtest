@@ -157,7 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${messages.map(message => `
                     <div class="message">
                         <div class="message-content">
-                            <img src="${friendsData[message.sender]}" alt="${message.sender}" class="avatar">
                             <p><strong>${message.sender}:</strong> ${message.text}</p>
                             <span class="datetime">${formatDate(new Date(message.datetime))}</span>
                         </div>
