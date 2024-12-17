@@ -1,13 +1,15 @@
 [
     {
         "name": "John Doe",
+        "avatarLink": "../assets/john_doe_ava.png",
         "lastMessage": "Hello Tung,  I am John Doe",
         "datetime": "2024-12-15T10:00:00Z"
 
     },
     {
-        "name": "Sebastien LLORCA",
-        "lastMessage": "Hello Tung,  I am Sebastien LLORCA",
+        "name": "Alain Smith",
+        "avatarLink": "../assets/alain_smith_ava.png",
+        "lastMessage": "Hello Tung,  I am Alain Smith",
         "datetime": "2024-12-17T10:00:00Z"
     }
 ]
