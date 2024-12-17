@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(friends => {
                 friendsData = friends.reduce((acc, friend) => {
-                    acc[friend.name] = friend.avatar;
+                    acc[`${friend.firstname} ${friend.lastname}`] = friend.avatar;
                     return acc;
                 }, {});
 
@@ -236,8 +236,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const friendElement = document.createElement('li');
                     friendElement.className = 'friend';
                     friendElement.innerHTML = `
-                        <img src="${friend.avatar}" alt="${friend.name}" class="avatar">
-                        <span>${friend.name}</span>
+                        <img src="${friend.avatar}" alt="${friend.firstname} ${friend.lastname}" class="avatar">
+                        <span>${friend.firstname} ${friend.lastname}</span>
                         <button class="message">Message</button>
                     `;
                     friendsList.appendChild(friendElement);
@@ -251,14 +251,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 searchInput.placeholder = 'Search friends...';
                 searchInput.addEventListener('input', () => {
                     const searchTerm = searchInput.value.toLowerCase();
-                    const filteredFriends = friends.filter(friend => friend.name.toLowerCase().includes(searchTerm));
+                    const filteredFriends = friends.filter(friend => `${friend.firstname} ${friend.lastname}`.toLowerCase().includes(searchTerm));
                     friendsList.innerHTML = '';
                     filteredFriends.forEach(friend => {
                         const friendElement = document.createElement('li');
                         friendElement.className = 'friend';
                         friendElement.innerHTML = `
-                            <img src="${friend.avatar}" alt="${friend.name}" class="avatar">
-                            <span>${friend.name}</span>
+                            <img src="${friend.avatar}" alt="${friend.firstname} ${friend.lastname}" class="avatar">
+                            <span>${friend.firstname} ${friend.lastname}</span>
                             <button class="message">Message</button>
                         `;
                         friendsList.appendChild(friendElement);
