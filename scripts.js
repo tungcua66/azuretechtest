@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const loadMessaging = () => {
+        console.log('messaging is loaded');
         fetch('./mocks/conversations.json')
             .then(response => response.json())
             .then(conversations => {
@@ -110,13 +111,70 @@ document.addEventListener('DOMContentLoaded', () => {
                     conversationElement.className = 'conversation';
                     conversationElement.innerHTML = `
                         <h3>${conversation.name}</h3>
-                        <p>${conversation.lastMessage}</p>
+                        <div class="message-preview">
+                            <p>${conversation.lastMessage}</p>
+                            <span class="datetime">${formatDate(new Date(conversation.datetime))}</span>
+                        </div>
                     `;
+                    conversationElement.addEventListener('click', () => {
+                        console.log('Conversation clicked:', conversation.name);
+                        loadConversationDetails(conversation);
+                    });
                     conversationsDiv.appendChild(conversationElement);
                 });
                 content.innerHTML = '';
                 content.appendChild(conversationsDiv);
             });
+    }
+
+    const loadConversationDetails = (conversation) => {
+        console.log('Loading conversation details for:', conversation.name);
+        fetch(`./mocks/${conversation.name.toLowerCase().replace(' ', '_')}_messages.json`)
+            .then(response => response.json())
+            .then(messages => {
+                const chatDiv = document.createElement('div');
+                chatDiv.id = 'chat';
+                chatDiv.innerHTML = `
+                    <h2>${conversation.name}</h2>
+                    <div id="message-history">
+                        ${messages.map(message => `
+                            <div class="message">
+                                <div class="message-content">
+                                    <p><strong>${message.sender}:</strong> ${message.text}</p>
+                                    <span class="datetime">${formatDate(new Date(message.datetime))}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <textarea id="new-message" placeholder="Type your message..."></textarea>
+                    <button id="send-message">Send</button>
+                `;
+                content.innerHTML = '';
+                content.appendChild(chatDiv);
+
+                document.getElementById('send-message').addEventListener('click', () => {
+                    const newMessage = document.getElementById('new-message').value.trim();
+                    if (newMessage) {
+                        const messageElement = document.createElement('div');
+                        messageElement.className = 'message';
+                        messageElement.innerHTML = `
+                            <div class="message-content">
+                                <p><strong>You:</strong> ${newMessage}</p>
+                                <span class="datetime">${formatDate(new Date())}</span>
+                            </div>
+                        `;
+                        document.getElementById('message-history').appendChild(messageElement);
+                        document.getElementById('new-message').value = '';
+                    }
+                });
+            });
+    }
+
+    const formatDate = (date) => {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
     }
 
     const loadFriends = () => {
@@ -165,6 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (page === 'feed') {
             loadFeed();
         } else if (page === 'messaging') {
+            console.log('messaging is loaded');
             loadMessaging();
         } else if (page === 'friends') {
             loadFriends();

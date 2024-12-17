@@ -133,3 +133,33 @@ input[type="text"] {
     background: #e0e0e0;
     border-radius: 5px;
 }
+
+.message-preview {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.message {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.message-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 2px;
+}
+
+.datetime {
+    margin-left: 10px;
+    font-size: 0.9em;
+    color: #888;
+    white-space: nowrap;
+}

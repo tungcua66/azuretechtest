@@ -1,10 +1,13 @@
 [
     {
-        "name": "Sebastien LLORCA",
-        "lastMessage": "Hello Tung, how are you?!"
+        "name": "John Doe",
+        "lastMessage": "Hello Tung,  I am John Doe",
+        "datetime": "2024-12-15T10:00:00Z"
+
     },
     {
-        "name": "Benoit Tung",
-        "lastMessage": "Hello Azure Tech Research, nice to meet you"
+        "name": "Sebastien LLORCA",
+        "lastMessage": "Hello Tung,  I am Sebastien LLORCA",
+        "datetime": "2024-12-17T10:00:00Z"
     }
 ]
