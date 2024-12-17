@@ -209,7 +209,8 @@ input[type="text"] {
 }
 
 .message-right {
-    background-color: rgb(118, 239, 239);
+    background-color: rgb(37, 47, 229);
+    color: rgb(255, 255, 255);
     border-radius: 10px;
     align-self: flex-end;
     align-items: flex-end;
