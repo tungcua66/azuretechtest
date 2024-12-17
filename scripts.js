@@ -110,7 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const loadMessaging = () => {
-        console.log('messaging is loaded');
         const conversations = [
             { name: 'John Doe', file: './mocks/john_doe_messages.json', avatar: './assets/john_doe_ava.png' },
             { name: 'Alain Smith', file: './mocks/alain_smith_messages.json', avatar: './assets/alain_smith_ava.png' }
@@ -141,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
                     conversationElement.addEventListener('click', () => {
-                        console.log('Conversation clicked:', conversation.name);
                         currentConversation = conversation;
                         loadConversationDetails(conversation);
                     });
@@ -154,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const loadConversationDetails = (conversation) => {
-        console.log('Loading conversation details for:', conversation.name);
+        console.log('conversation', conversation)
         const messages = messagesData[conversation.name] || [];
         fetch(conversation.file)
             .then(response => response.json())
@@ -291,11 +289,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const loadPage = (page) => {
-        console.log('page', page);
         if (page === 'feed') {
             loadFeed();
         } else if (page === 'messaging') {
-            console.log('messaging is loaded');
             loadMessaging();
         } else if (page === 'friends') {
             loadFriends();

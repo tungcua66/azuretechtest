@@ -1,14 +1,14 @@
 [
     { 
-        "firstname": "John",
-        "lastname": "Doe",
-        "age": 21,
-        "avatar": "../assets/john_doe_ava.png"
-    },
-    { 
         "firstname": "Alain",
         "lastname": "Smith",
         "age": 30,
         "avatar": "../assets/alain_smith_ava.png"
+    },
+    { 
+        "firstname": "John",
+        "lastname": "Doe",
+        "age": 21,
+        "avatar": "../assets/john_doe_ava.png"
     }
 ]
