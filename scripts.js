@@ -139,10 +139,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div id="message-history">
                         ${messages.map(message => `
                             <div class="message">
-                                <div class="message-content">
-                                    <p><strong>${message.sender}:</strong> ${message.text}</p>
-                                    <span class="datetime">${formatDate(new Date(message.datetime))}</span>
-                                </div>
+                                <p><strong>${message.sender}:</strong> ${message.text}</p>
+                                <span class="datetime">${formatDate(new Date(message.datetime))}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -157,12 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (newMessage) {
                         const messageElement = document.createElement('div');
                         messageElement.className = 'message';
-                        messageElement.innerHTML = `
-                            <div class="message-content">
-                                <p><strong>You:</strong> ${newMessage}</p>
-                                <span class="datetime">${formatDate(new Date())}</span>
-                            </div>
-                        `;
+                        messageElement.innerHTML = `<p><strong>You:</strong> ${newMessage}</p><span class="datetime">${formatDate(new Date())}</span>`;
                         document.getElementById('message-history').appendChild(messageElement);
                         document.getElementById('new-message').value = '';
                     }

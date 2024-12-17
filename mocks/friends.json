@@ -1,4 +1,12 @@
 [
-    { "name": "John Doe" },
-    { "name": "Alain Smith" }
+    { 
+        "name": "John Doe",
+        "age": 21,
+        "avatar": "john_doe_ava.png"
+    },
+    { 
+        "name": "Alain Smith",
+        "age": 30,
+        "avatar": "alain_smith_ava.png"
+    }
 ]

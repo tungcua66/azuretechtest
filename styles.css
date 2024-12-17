@@ -163,3 +163,16 @@ input[type="text"] {
     color: #888;
     white-space: nowrap;
 }
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.conversation-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
