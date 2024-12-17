@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const content = document.getElementById('content');
+    let friendsData = {};
+    let currentConversation = null;
+    let messagesData = {}; // Ensure messagesData is defined at the top level
 
     const loadFeed = () => {
         fetch('./mocks/posts.json')
@@ -101,66 +104,115 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loadMessaging = () => {
         console.log('messaging is loaded');
-        fetch('./mocks/conversations.json')
-            .then(response => response.json())
-            .then(conversations => {
-                const conversationsDiv = document.createElement('div');
-                conversationsDiv.id = 'conversations';
-                conversations.forEach(conversation => {
+        const conversations = [
+            { name: 'John Doe', file: './mocks/john_doe_messages.json', avatar: './assets/john_doe_ava.png' },
+            { name: 'Alain Smith', file: './mocks/alain_smith_messages.json', avatar: './assets/alain_smith_ava.png' }
+        ];
+
+        const conversationsDiv = document.createElement('div');
+        conversationsDiv.id = 'conversations';
+
+        conversations.forEach(conversation => {
+            fetch(conversation.file)
+                .then(response => response.json())
+                .then(messages => {
+                    messagesData[conversation.name] = messages;
+                    const lastMessage = messages.reduce((latest, message) => {
+                        return new Date(message.datetime) > new Date(latest.datetime) ? message : latest;
+                    });
+
                     const conversationElement = document.createElement('div');
                     conversationElement.className = 'conversation';
                     conversationElement.innerHTML = `
-                        <h3>${conversation.name}</h3>
+                        <div class="conversation-header">
+                            <img src="${conversation.avatar}" alt="${conversation.name}" class="avatar">
+                            <h3>${conversation.name}</h3>
+                        </div>
                         <div class="message-preview">
-                            <p>${conversation.lastMessage}</p>
-                            <span class="datetime">${formatDate(new Date(conversation.datetime))}</span>
+                            <p>${lastMessage.text}</p>
+                            <span class="datetime">${formatDate(new Date(lastMessage.datetime))}</span>
                         </div>
                     `;
                     conversationElement.addEventListener('click', () => {
                         console.log('Conversation clicked:', conversation.name);
+                        currentConversation = conversation;
                         loadConversationDetails(conversation);
                     });
                     conversationsDiv.appendChild(conversationElement);
                 });
-                content.innerHTML = '';
-                content.appendChild(conversationsDiv);
-            });
+        });
+
+        content.innerHTML = '';
+        content.appendChild(conversationsDiv);
     }
 
     const loadConversationDetails = (conversation) => {
         console.log('Loading conversation details for:', conversation.name);
-        fetch(`./mocks/${conversation.name.toLowerCase().replace(' ', '_')}_messages.json`)
-            .then(response => response.json())
-            .then(messages => {
-                const chatDiv = document.createElement('div');
-                chatDiv.id = 'chat';
-                chatDiv.innerHTML = `
-                    <h2>${conversation.name}</h2>
-                    <div id="message-history">
-                        ${messages.map(message => `
-                            <div class="message">
-                                <p><strong>${message.sender}:</strong> ${message.text}</p>
-                                <span class="datetime">${formatDate(new Date(message.datetime))}</span>
-                            </div>
-                        `).join('')}
+        const messages = messagesData[conversation.name];
+        const chatDiv = document.createElement('div');
+        chatDiv.id = 'chat';
+        chatDiv.innerHTML = `
+            <h2>${conversation.name}</h2>
+            <div id="message-history">
+                ${messages.map(message => `
+                    <div class="message">
+                        <div class="message-content">
+                            <img src="${friendsData[message.sender]}" alt="${message.sender}" class="avatar">
+                            <p><strong>${message.sender}:</strong> ${message.text}</p>
+                            <span class="datetime">${formatDate(new Date(message.datetime))}</span>
+                        </div>
                     </div>
-                    <textarea id="new-message" placeholder="Type your message..."></textarea>
-                    <button id="send-message">Send</button>
-                `;
-                content.innerHTML = '';
-                content.appendChild(chatDiv);
+                `).join('')}
+            </div>
+            <textarea id="new-message" placeholder="Type your message..."></textarea>
+            <button id="send-message">Send</button>
+        `;
+        content.innerHTML = '';
+        content.appendChild(chatDiv);
 
-                document.getElementById('send-message').addEventListener('click', () => {
-                    const newMessage = document.getElementById('new-message').value.trim();
-                    if (newMessage) {
-                        const messageElement = document.createElement('div');
-                        messageElement.className = 'message';
-                        messageElement.innerHTML = `<p><strong>You:</strong> ${newMessage}</p><span class="datetime">${formatDate(new Date())}</span>`;
-                        document.getElementById('message-history').appendChild(messageElement);
-                        document.getElementById('new-message').value = '';
-                    }
+        document.getElementById('send-message').addEventListener('click', () => {
+            const newMessage = document.getElementById('new-message').value.trim();
+            if (newMessage) {
+                const messageElement = document.createElement('div');
+                messageElement.className = 'message';
+                const newMessageData = {
+                    sender: 'You',
+                    text: newMessage,
+                    datetime: new Date().toISOString()
+                };
+                messageElement.innerHTML = `
+                    <div class="message-content">
+                        <img src="${friendsData['You']}" alt="You" class="avatar">
+                        <p><strong>You:</strong> ${newMessage}</p>
+                        <span class="datetime">${formatDate(new Date(newMessageData.datetime))}</span>
+                    </div>
+                `;
+                document.getElementById('message-history').appendChild(messageElement);
+                document.getElementById('new-message').value = '';
+
+                // Simulate adding the message to the JSON file
+                messagesData[conversation.name].push(newMessageData);
+
+                // Send the new message to the server to update the JSON file
+                fetch('/add-message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        conversation: conversation.name,
+                        message: newMessageData
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
                 });
-            });
+            }
+        });
     }
 
     const formatDate = (date) => {
@@ -174,12 +226,18 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch('./mocks/friends.json')
             .then(response => response.json())
             .then(friends => {
+                friendsData = friends.reduce((acc, friend) => {
+                    acc[friend.name] = friend.avatar;
+                    return acc;
+                }, {});
+
                 const friendsList = document.createElement('ul');
                 friendsList.id = 'friends-list';
                 friends.forEach(friend => {
                     const friendElement = document.createElement('li');
                     friendElement.className = 'friend';
                     friendElement.innerHTML = `
+                        <img src="${friend.avatar}" alt="${friend.name}" class="avatar">
                         <span>${friend.name}</span>
                         <button class="message">Message</button>
                     `;
@@ -200,6 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const friendElement = document.createElement('li');
                         friendElement.className = 'friend';
                         friendElement.innerHTML = `
+                            <img src="${friend.avatar}" alt="${friend.name}" class="avatar">
                             <span>${friend.name}</span>
                             <button class="message">Message</button>
                         `;
