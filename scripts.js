@@ -110,9 +110,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const loadMessaging = () => {
+        console.log('messaging is loaded');
         const conversations = [
-            { name: 'John Doe', file: './mocks/john_doe_messages.json', avatar: '../assets/john_doe_ava.png' },
-            { name: 'Alain Smith', file: './mocks/alain_smith_messages.json', avatar: '../assets/alain_smith_ava.png' }
+            { name: 'John Doe', file: './mocks/john_doe_messages.json', avatar: './assets/john_doe_ava.png' },
+            { name: 'Alain Smith', file: './mocks/alain_smith_messages.json', avatar: './assets/alain_smith_ava.png' }
         ];
 
         const conversationsDiv = document.createElement('div');
@@ -140,6 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
                     conversationElement.addEventListener('click', () => {
+                        console.log('Conversation clicked:', conversation.name);
                         currentConversation = conversation;
                         loadConversationDetails(conversation);
                     });
@@ -152,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const loadConversationDetails = (conversation) => {
-        console.log('conversation', conversation)
+        console.log('Loading conversation details for:', conversation.name);
         const messages = messagesData[conversation.name] || [];
         fetch(conversation.file)
             .then(response => response.json())
@@ -165,9 +167,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div id="message-history">
                         ${fetchedMessages.map(message => `
                             <div class="message ${message.sender === 'You' ? 'message-right' : 'message-left'}">
-                                    <span class="datetime">${formatDate(new Date(message.datetime))}</span>
-                                    ${message.sender !== 'You' ? `<img src="${conversation.avatar}" alt="${message.sender}" class="avatar">` : `<div></div>`}
+                                <div class="message-content">
+                                    ${message.sender !== 'You' ? `<img src="${friendsData[message.sender]}" alt="${message.sender}" class="avatar">` : ''}
                                     <p><strong>${message.sender}:</strong> ${message.text}</p>
+                                    <span class="datetime">${formatDate(new Date(message.datetime))}</span>
+                                </div>
                             </div>
                         `).join('')}
                     </div>
@@ -176,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 content.innerHTML = '';
                 content.appendChild(chatDiv);
-                
+
                 document.getElementById('send-message').addEventListener('click', () => {
                     const newMessage = document.getElementById('new-message').value.trim();
                     if (newMessage) {
@@ -188,14 +192,35 @@ document.addEventListener('DOMContentLoaded', () => {
                             datetime: new Date().toISOString()
                         };
                         messageElement.innerHTML = `
-                            <div class="message message-right">
-                                <span class="datetime">${formatDate(new Date(newMessageData.datetime))}</span>
+                            <div class="message-content">
                                 <p><strong>You:</strong> ${newMessage}</p>
+                                <span class="datetime">${formatDate(new Date(newMessageData.datetime))}</span>
                             </div>
                         `;
                         document.getElementById('message-history').appendChild(messageElement);
                         document.getElementById('new-message').value = '';
 
+                        // Simulate adding the message to the JSON file
+                        messagesData[conversation.name].push(newMessageData);
+
+                        // Send the new message to the server to update the JSON file
+                        fetch('/add-message', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                conversation: conversation.name,
+                                message: newMessageData
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data.message);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
                     }
                 });
             });
@@ -215,6 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 friends.forEach(friend => {
                     const friendElement = document.createElement('li');
                     friendElement.className = 'friend';
+                    friendElement.draggable = true;
                     friendElement.innerHTML = `
                         <img src="${friend.avatar}" alt="${friend.firstname} ${friend.lastname}" class="avatar">
                         <span>${friend.firstname} ${friend.lastname}</span>
@@ -229,8 +255,31 @@ document.addEventListener('DOMContentLoaded', () => {
                         currentConversation = conversation;
                         loadConversationDetails(conversation);
                     });
+
+                    // Add drag and drop event listeners
+                    friendElement.addEventListener('dragstart', (event) => {
+                        event.dataTransfer.setData('text/plain', friendElement.id);
+                        friendElement.classList.add('dragging');
+                    });
+
+                    friendElement.addEventListener('dragend', () => {
+                        friendElement.classList.remove('dragging');
+                    });
+
                     friendsList.appendChild(friendElement);
                 });
+
+                friendsList.addEventListener('dragover', (event) => {
+                    event.preventDefault();
+                    const draggingElement = document.querySelector('.dragging');
+                    const afterElement = getDragAfterElement(friendsList, event.clientY);
+                    if (afterElement == null) {
+                        friendsList.appendChild(draggingElement);
+                    } else {
+                        friendsList.insertBefore(draggingElement, afterElement);
+                    }
+                });
+
                 content.innerHTML = '';
                 content.appendChild(friendsList);
 
@@ -245,6 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     filteredFriends.forEach(friend => {
                         const friendElement = document.createElement('li');
                         friendElement.className = 'friend';
+                        friendElement.draggable = true; // Make the friend element draggable
                         friendElement.innerHTML = `
                             <img src="${friend.avatar}" alt="${friend.firstname} ${friend.lastname}" class="avatar">
                             <span>${friend.firstname} ${friend.lastname}</span>
@@ -259,6 +309,17 @@ document.addEventListener('DOMContentLoaded', () => {
                             currentConversation = conversation;
                             loadConversationDetails(conversation);
                         });
+
+                        // Add drag and drop event listeners
+                        friendElement.addEventListener('dragstart', (event) => {
+                            event.dataTransfer.setData('text/plain', friendElement.id);
+                            friendElement.classList.add('dragging');
+                        });
+
+                        friendElement.addEventListener('dragend', () => {
+                            friendElement.classList.remove('dragging');
+                        });
+
                         friendsList.appendChild(friendElement);
                     });
                 });
@@ -267,13 +328,33 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error('Error fetching friends:', error));
     }
 
+    const getDragAfterElement = (container, y) => {
+        const draggableElements = [...container.querySelectorAll('.friend:not(.dragging)')];
+
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
     const loadPage = (page) => {
-        if (page === 'feed') {
-            loadFeed();
-        } else if (page === 'messaging') {
-            loadMessaging();
-        } else if (page === 'friends') {
-            loadFriends();
+        switch (page) {
+            case 'feed':
+                loadFeed();
+                break;
+            case 'messaging':
+                loadMessaging();
+                break;
+            case 'friends':
+                loadFriends();
+                break;
+            default:
+                loadFeed();
         }
     }
 
@@ -281,7 +362,6 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', (event) => {
             event.preventDefault();
             const page = event.target.getAttribute('data-page');
-            // history.pushState({ page }, '', `${page}.html`);
             loadPage(page);
         });
     });
