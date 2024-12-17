@@ -111,8 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loadMessaging = () => {
         const conversations = [
-            { name: 'John Doe', file: './mocks/john_doe_messages.json', avatar: './assets/john_doe_ava.png' },
-            { name: 'Alain Smith', file: './mocks/alain_smith_messages.json', avatar: './assets/alain_smith_ava.png' }
+            { name: 'John Doe', file: './mocks/john_doe_messages.json', avatar: '../assets/john_doe_ava.png' },
+            { name: 'Alain Smith', file: './mocks/alain_smith_messages.json', avatar: '../assets/alain_smith_ava.png' }
         ];
 
         const conversationsDiv = document.createElement('div');
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${fetchedMessages.map(message => `
                             <div class="message ${message.sender === 'You' ? 'message-right' : 'message-left'}">
                                     <span class="datetime">${formatDate(new Date(message.datetime))}</span>
-                                    ${message.sender !== 'You' ? `<img src="${friendsData[message.sender]}" alt="${message.sender}" class="avatar">` : `<div></div>`}
+                                    ${message.sender !== 'You' ? `<img src="${conversation.avatar}" alt="${message.sender}" class="avatar">` : `<div></div>`}
                                     <p><strong>${message.sender}:</strong> ${message.text}</p>
                             </div>
                         `).join('')}
@@ -196,27 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.getElementById('message-history').appendChild(messageElement);
                         document.getElementById('new-message').value = '';
 
-                        // Simulate adding the message to the JSON file
-                        messagesData[conversation.name].push(newMessageData);
-
-                        // Send the new message to the server to update the JSON file
-                        fetch('/add-message', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                conversation: conversation.name,
-                                message: newMessageData
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log(data.message);
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
                     }
                 });
             });
